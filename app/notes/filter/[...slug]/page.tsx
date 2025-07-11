@@ -3,11 +3,12 @@ import NotesClient from './Notes.client';
 import type { Metadata } from 'next';
 
 type Props = {
-  params: { slug: string[] };
+  params: Promise<{ slug: string[] }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const filterSlug = params.slug?.[0] || 'All';
+  const {slug} = await params;
+  const filterSlug = slug?.[0] || 'All';
   const isAll = filterSlug === 'All';
 
   const readableTag = isAll
@@ -37,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 const App = async ({ params }: Props) => {
- const { slug } = params;
+ const { slug } = await params;
   const tag = slug?.[0] === 'All' ? undefined : slug?.[0];
   const data = await fetchNotes('', 1, tag);
 
