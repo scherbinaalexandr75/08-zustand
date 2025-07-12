@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title,
       description,
-      url: `https://notehub.example.com/notes/${id}`, // замініть на ваш домен
+      url: `https://08-zustand-one-alpha.vercel.app/notes/${id}`, 
       images: [
         {
           url: 'https://ac.goit.global/fullstack/react/notehub-og-meta.jpg',
