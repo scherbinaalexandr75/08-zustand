@@ -11,13 +11,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const filter = slug?.[0] === "All" ? undefined : slug?.[0];
   const tag = filter || "All notes";
 
+const BASE_URL = process.env.NEXT_PUBLIC_APP_BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+ const path = filter ? `/notes/filter/${encodeURIComponent(filter)}` : '/notes/filter/All';
+
   return {
     title: tag,
     description: `Note filtered by: ${tag}`,
     openGraph: {
       title: tag,
       description: `Note filtered by: ${tag}`,
-      url: `https://08-zustand-one-alpha.vercel.app//notes/filter/`,
+      url: `${BASE_URL}${path}`,
       images: [
         {
           url: 'https://ac.goit.global/fullstack/react/notehub-og-meta.jpg',
