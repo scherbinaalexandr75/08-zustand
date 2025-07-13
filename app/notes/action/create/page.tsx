@@ -1,10 +1,10 @@
 import NoteForm from '@/components/NoteForm/NoteForm';
 import css from './CreateNote.module.css';
+import type { Metadata } from 'next';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Створити нову замітку',
   description: 'Створіть нову замітку та збережіть її як чернетку або опублікуйте.',
-  url: 'https://08-zustand-one-alpha.vercel.app/notes/action/create', 
   openGraph: {
     title: 'Створити нову замітку',
     description: 'Створіть нову замітку та збережіть її як чернетку або опублікуйте.',

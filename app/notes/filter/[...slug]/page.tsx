@@ -8,22 +8,16 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const {slug} = await params;
-  const filterSlug = slug?.[0] || 'All';
-  const isAll = filterSlug === 'All';
-
-  const readableTag = isAll
-    ? 'Ecs yjnfnrb'
-    : decodeURIComponent(filterSlug.replace(/-/g, ' '));
-  const title = `Фільтр: ${readableTag} - Note Hub`;
-  const description = isAll ? '' : `dgfgdfg: ${readableTag}.`;
+  const filter = slug?.[0] === "All" ? undefined : slug?.[0];
+  const tag = filter || "All notes";
 
   return {
-    title,
-    description,
+    title: tag,
+    description: `Note filtered by: ${tag}`,
     openGraph: {
-      title,
-      description,
-      url: `https://08-zustand-one-alpha.vercel.app//notes/filter/${filterSlug}`,
+      title: tag,
+      description: `Note filtered by: ${tag}`,
+      url: `https://08-zustand-one-alpha.vercel.app//notes/filter/`,
       images: [
         {
           url: 'https://ac.goit.global/fullstack/react/notehub-og-meta.jpg',
@@ -32,7 +26,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           alt: 'Note Hub Filter View',
         },
       ],
-      type: 'website',
     },
   };
 }

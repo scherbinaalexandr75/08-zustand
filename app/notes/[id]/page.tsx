@@ -7,6 +7,8 @@ import NoteDetailsClient from './NoteDetails.client';
 import { fetchNoteById } from '@/lib/api';
 import type { Metadata } from 'next';
 
+const BASE_URL = process.env.NEXT_PUBLIC_APP_BASE_URL || process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
+
 type Props = { 
   params: Promise<{id: string }>;
 };
@@ -33,7 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title,
       description,
-      url: `https://08-zustand-one-alpha.vercel.app/notes/${id}`, 
+      url:`${BASE_URL}/notes/${id}`, 
       images: [
         {
           url: 'https://ac.goit.global/fullstack/react/notehub-og-meta.jpg',

@@ -22,9 +22,9 @@ interface NoteStoreState {
 export const useNoteStore = create<NoteStoreState>()(
   persist(
     set => ({
-      draft: initialDraft,
+      draft: { ...initialDraft },
       setDraft: (note: NoteDraft) => set({ draft: note }),
-      clearDraft: () => ({ draft: initialDraft }),
+      clearDraft: () => set({ draft: { ...initialDraft }}),
     }),
     {
       name: 'note-draft-storage',

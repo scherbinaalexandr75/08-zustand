@@ -1,70 +1,48 @@
-'use client'; 
+'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import toast from 'react-hot-toast'; 
-import { createNote } from '../../lib/api'; 
-import type { NoteInput } from '../../types/note'; 
+import toast from 'react-hot-toast';
+import { createNote } from '../../lib/api';
+import type { NoteInput } from '../../types/note';
 import { useNoteStore } from '@/lib/store/noteStore';
-import { useRouter } from 'next/navigation'; 
+import { useRouter } from 'next/navigation';
 import css from './NoteForm.module.css';
-
-
-const initialFormState: NoteInput = {
-  title: '',
-  content: '',
-  tag: 'Todo',
-};
 
 export default function NoteForm() {
   const queryClient = useQueryClient();
-  const router = useRouter(); 
-
+  const router = useRouter();
   const { draft, setDraft, clearDraft } = useNoteStore();
 
-  const [title, setTitle] = useState(initialFormState.title);
-  const [content, setContent] = useState(initialFormState.content);
-  const [tag, setTag] = useState<NoteInput['tag']>(initialFormState.tag);
   const [errors, setErrors] = useState<{
     title?: string;
     content?: string;
     tag?: string;
   }>({});
-  
-  useEffect(() => {
-    if (draft.title || draft.content) {
-      setTitle(draft.title);
-      setContent(draft.content);
-      setTag(draft.tag);
-      toast('Завантажено збережену чернетку.');
-    } else {
-    
-      setTitle(initialFormState.title);
-      setContent(initialFormState.content);
-      setTag(initialFormState.tag);
-    }
-  }, [draft]);
 
   const validate = (): boolean => {
     const newErrors: { title?: string; content?: string; tag?: string } = {};
     let isValid = true;
 
-    if (!title || title.trim().length < 3) {
+    if (!draft.title || draft.title.trim().length < 3) {
       newErrors.title = 'Назва повинна містити щонайменше 3 символи.';
       isValid = false;
-    } else if (title.trim().length > 50) {
+    } else if (draft.title.trim().length > 50) {
       newErrors.title = 'Назва занадто довга (макс. 50 символів).';
       isValid = false;
     }
-    if (content.trim().length > 500) {
+
+    if (draft.content.trim().length > 500) {
       newErrors.content = 'Вміст занадто довгий (макс. 500 символів).';
       isValid = false;
     }
+
     const validTags = ['Todo', 'Work', 'Personal', 'Meeting', 'Shopping'];
-    if (!validTags.includes(tag)) {
+    if (!validTags.includes(draft.tag)) {
       newErrors.tag = 'Недійсний тег.';
       isValid = false;
     }
+
     setErrors(newErrors);
     return isValid;
   };
@@ -73,7 +51,7 @@ export default function NoteForm() {
     mutationFn: (newNote: NoteInput) => createNote(newNote),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['note'] });
-      clearDraft(); 
+      clearDraft();
       toast.success('Замітка успішно створена!');
       router.back();
     },
@@ -89,21 +67,13 @@ export default function NoteForm() {
     >
   ) => {
     const { name, value } = e.target;
-    if (name === 'title') {
-      setTitle(value);
-    } else if (name === 'content') {
-      setContent(value);
-    } else if (name === 'tag') {
-      setTag(value as NoteInput['tag']);
-    }
-
-    setErrors(prev => ({ ...prev, [name]: undefined }));
 
     setDraft({
-      title: name === 'title' ? value : title,
-      content: name === 'content' ? value : content,
-      tag: name === 'tag' ? (value as NoteInput['tag']) : tag,
+      ...draft,
+      [name]: value,
     });
+
+    setErrors(prev => ({ ...prev, [name]: undefined }));
   };
 
   const handleCancel = () => {
@@ -112,15 +82,13 @@ export default function NoteForm() {
 
   const handlePublish = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     const isValid = validate();
     if (!isValid) {
       toast.error('Будь ласка, виправте помилки форми перед публікацією.');
       return;
     }
 
-    const noteData: NoteInput = { title, content, tag };
-    mutate(noteData);
+    mutate(draft);
   };
 
   return (
@@ -132,7 +100,7 @@ export default function NoteForm() {
           type="text"
           name="title"
           className={css.input}
-          value={title}
+          value={draft.title}
           onChange={handleChange}
           required
         />
@@ -145,7 +113,7 @@ export default function NoteForm() {
           name="content"
           rows={8}
           className={css.textarea}
-          value={content}
+          value={draft.content}
           onChange={handleChange}
         />
         {errors.content && <span className={css.error}>{errors.content}</span>}
@@ -156,7 +124,7 @@ export default function NoteForm() {
           id="tag"
           name="tag"
           className={css.select}
-          value={tag}
+          value={draft.tag}
           onChange={handleChange}
         >
           <option value="Todo">Todo</option>
@@ -180,7 +148,7 @@ export default function NoteForm() {
           className={`${css.button} ${css.publishButton}`}
           disabled={isPending}
         >
-          {isPending ? 'Створюється...' : 'Опублікувати замітку'}
+          {isPending ? 'Creating...' : 'Create note'}
         </button>
       </div>
     </form>
